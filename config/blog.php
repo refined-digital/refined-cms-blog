@@ -22,6 +22,8 @@ return [
 
     'file' => false,
 
+    'contentBlocks' => true,
+
     'externalLink' => false,
     /**
      * or

@@ -44,6 +44,7 @@ class Install extends Command
         $this->seed();
         $this->publish();
         $this->copyDefaults();
+        $this->installContentBlock();
         $this->info('Blog has been successfully installed');
     }
 
@@ -91,7 +92,6 @@ class Install extends Command
     {
         $this->output->writeln('<info>Copying Templates</info>');
         $this->copy('views/templates');
-        $this->copy('views/templates/content');
         $this->copy('css/components');
     }
 
@@ -108,6 +108,7 @@ class Install extends Command
         if (sizeof($templates)) {
             try {
                 foreach ($templates as $template) {
+                $this->output->writeln(' <info>Copying '.$template.'</info>');
                     $contents = file_get_contents($dir.$template);
                     file_put_contents(resource_path($assetDir.'/'.$template), $contents);
                 }
@@ -115,6 +116,32 @@ class Install extends Command
                 $this->output->writeln('<error>Failed to copy all assets</error>');
             }
         }
+    }
+
+    private function installContentBlock()
+    {
+        $from = __DIR__.'/defaults/app/RefinedCMS/Blocks/BlogListing';
+        $to = app_path('RefinedCMS/Content/Blocks');
+
+        exec('cp -r '.$from.' '.$to);
+
+        $appFile = app_path('RefinedCMS/content/Providers/ContentServiceProvider.php');
+
+        // get the contents of the file
+        $appData = file_get_contents($appFile);
+
+        $search = [
+            "// register the content fields",
+            "use Illuminate\Support\ServiceProvider;"
+        ];
+        $replace = [
+            '// register the content fields'."\n\t\t".'$agg->register(BlogListing::class);',
+            'use App\\RefinedCMS\\Content\\Blocks\\BlogListing\\BlogListing;'."\nuse Illuminate\Support\ServiceProvider;"
+        ];
+
+        $appData = str_replace($search, $replace, $appData);
+
+        file_put_contents($appFile, $appData);
     }
 
 }

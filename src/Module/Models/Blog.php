@@ -30,7 +30,6 @@ class Blog extends CoreModel
         'image',
         'banner',
         'text',
-        'content',
         'data',
         'external_link',
         'file',
@@ -62,11 +61,8 @@ class Blog extends CoreModel
                             'name'   => 'Content',
                             'fields' => [
                                 [
-                                    ['label' => 'Heading', 'name' => 'name', 'required' => true, 'attrs' => ['v-model' => 'content.name', '@keyup' => 'updateSlug' ] ],
+                                    [ 'label' => 'Heading', 'name' => 'name', 'required' => true, 'attrs' => ['v-model' => 'content.name', '@keyup' => 'updateSlug' ] ],
                                     [ 'label' => 'Date', 'name' => 'published_at','required' => true, 'type' => 'datetime' ],
-                                ],
-                                [
-                                    [ 'label' => 'Content', 'name' => 'text', 'required' => true, 'type' => 'richtext' ],
                                 ],
                             ]
                         ]
@@ -86,13 +82,13 @@ class Blog extends CoreModel
                 ]
             ]
         ],
+    ];
 
-        [
-            'name' => 'Content Blocks',
-            'fields' => [
-                [
-                    ['label' => 'Content', 'name' => 'content', 'type' => 'contentBlocks', 'hideLabel' => true],
-                ],
+    protected $contentBlocks = [
+        'name' => 'Content Blocks',
+        'fields' => [
+            [
+                ['label' => 'Content', 'name' => 'content', 'type' => 'contentBlocks', 'hideLabel' => true],
             ],
         ],
     ];
@@ -240,6 +236,10 @@ class Blog extends CoreModel
                 $imageBlock['fields'] = $config['images'];
             }
             $fields[] = $imageBlock;
+        }
+
+        if (isset($config['contentBlocks']) && $config['contentBlocks']) {
+            $fields[] = $this->contentBlocks;
         }
 
         return $this->setImages($fields, $config);

@@ -1,19 +1,13 @@
 @php
-    $classes = [
-      'page__block',
-      'page__block--blog-listing',
-      'page__block--no-top-padding',
-    ];
+    $classes = array_merge($classes, [
+      'page__block--bg-'.((isset($content->background_colour) && $content->background_colour) ? $content->background_colour : 'white'),
+    ]);
+
     $repo = new \RefinedDigital\Blog\Module\Http\Repositories\BlogRepository();
     $data = $repo->getForFront(8);
     $newsPageLink = pages()->getPageLink(PAGE_ID).'/';
 @endphp
 
-@section('xml-sitemap')
-    @php
-        echo json_encode(blog()->getXmlSitemap($newsPageLink));
-    @endphp
-@stop
 <section class="{{ implode(' ', $classes) }}" id="page-block--{{ $page->id }}-{{ $index }}">
     <div class="holder">
         <div class="articles grid">
